@@ -9,8 +9,8 @@ function limeSeg_PostProcessing(outputDir)
 
 
     if exist(fullfile(outputDir, 'Results', 'zScaleOfGland.mat'), 'file') == 0
-        zScale = inputdlg('Insert z-scale of Gland');
-        zScale = str2double(zScale{1});
+         zScale = inputdlg('Insert z-scale of Gland');
+         zScale = str2double(zScale{1});
 
         save(fullfile(outputDir, 'Results', 'zScaleOfGland.mat'), 'zScale');
     else
@@ -20,7 +20,6 @@ function limeSeg_PostProcessing(outputDir)
     if exist(fullfile(outputDir, 'Results', 'pixelScaleOfGland.mat'), 'file') == 0
         pixelScale = inputdlg('Insert pixel width of Gland');
         pixelScale = str2double(pixelScale{1});
-
         save(fullfile(outputDir, 'Results', 'pixelScaleOfGland.mat'), 'pixelScale');
     else
         load(fullfile(outputDir, 'Results', 'pixelScaleOfGland.mat')); 
@@ -51,9 +50,14 @@ function limeSeg_PostProcessing(outputDir)
         colours = [];
         
         [labelledImage] = processCells(fullfile(outputDir, 'Cells', 'OutputLimeSeg'), resizeImg, imgSize, zScale, tipValue);
-        
-
-        [indx,~] = listdlg('PromptString',{'Lumen selection'},'SelectionMode','single','ListString',{'Infer lumen','Draw in matlab', 'LimeSeg lumen', 'Photoshop lumen'});
+        [indx,~] = listdlg('PromptString',{'Valid region selection'},'SelectionMode','single','ListString',{'valid Region','No'});
+        switch indx
+            case 1
+                 load(fullfile(outputDir, 'validRegion.mat'))
+                 validRegion = addTipsImg3D(tipValue,imresize3(double(labels)==1,imgSize,'nearest'));
+                 labelledImage(validRegion==0)=0;
+        end
+        [indx,~] = listdlg('PromptString',{'Lumen selection'},'SelectionMode','single','ListString',{'Infer lumen','Draw in matlab', 'LimeSeg lumen', 'Photoshop lumen','Volume Segmenter lumen'});
         switch indx
             case 1
                 [labelledImage, lumenImage] = inferLumen(labelledImage);
@@ -64,6 +68,10 @@ function limeSeg_PostProcessing(outputDir)
                 labelledImage(lumenImage) = 0;
             case 4
                 [labelledImage, lumenImage] = processLumen(fullfile(outputDir, 'Lumen', filesep), labelledImage, resizeImg, tipValue);
+            case 5
+                load(fullfile(outputDir, 'validRegion.mat'))
+                lumenImage = logical(addTipsImg3D(tipValue,imresize3(double(labels)==2,imgSize,'nearest')));
+
         end
         
         try

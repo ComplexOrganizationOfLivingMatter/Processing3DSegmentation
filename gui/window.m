@@ -118,18 +118,18 @@ buttonsToRemove(2).Visible = 'Off';
 buttonsToRemove(3).Visible = 'Off';
 buttonsToRemove(4).Visible = 'Off';
 buttonsToRemove(5).Visible = 'Off';
-buttonsToRemove(6).Visible = 'Off';
+%buttonsToRemove(6).Visible = 'Off';
 
 buttonsToRemove = findall(handles.figure1, 'Type', 'uitoggletool');
 buttonsToRemove(1).Visible = 'off';
 buttonsToRemove(2).Visible = 'off';
 buttonsToRemove(3).Visible = 'off';
 buttonsToRemove(4).Visible = 'off';
-buttonsToRemove(5).Visible = 'off';
-buttonsToRemove(9).Visible = 'off';
+% buttonsToRemove(5).Visible = 'off';
+% buttonsToRemove(9).Visible = 'off';
 
-hOpen = findall(gcf, 'tooltipstring', 'Brush/Select Data');
-hOpen(1).Visible = 'off';
+% hOpen = findall(gcf, 'tooltipstring', 'Brush/Select Data');
+% hOpen(1).Visible = 'off';
 
 % Update handles structure
 guidata(hObject, handles);
