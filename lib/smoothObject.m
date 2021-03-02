@@ -27,9 +27,9 @@ function [labelledImage] = smoothObject(labelledImage,pixelLocations, numCell)
         inCellIndices = sub2ind(size(labelledImage), qx(tf), qy(tf), qz(tf));
         actualCell(inCellIndices) = 1;
         actualCell(labelledImage == numCell) = 1;
-        actualCell = imdilate(actualCell, strel('sphere', 2));
+%         actualCell = imdilate(actualCell, strel('sphere', 2));
         filledCell = imfill(double(actualCell),  4, 'holes');
-        filledCell = imerode(filledCell, strel('sphere', 2));
+%         filledCell = imerode(filledCell, strel('sphere', 2));
         filledCell = double(filledCell);
         if lumenImage
             filledCellOpen = imopen(filledCell, strel('sphere', 2));
