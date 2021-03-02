@@ -71,7 +71,7 @@ function plantSeg_PostProcessing(outputDir, fileName)
         if size(dir(fullfile(outputDir, 'Lumen/SegmentedLumen', '*.tif')),1) > 0
             [labelledImage, lumenImage] = processLumen(fullfile(outputDir, 'Lumen', filesep), labelledImage, resizeImg, tipValue);
         else
-            [indx,~] = listdlg('PromptString',{'Lumen selection'},'SelectionMode','single','ListString',{'Select the biggest cell','Draw in matlab'});
+            [indx,~] = listdlg('PromptString',{'Lumen selection'},'SelectionMode','single','ListString',{'Select the biggest cell','Draw in matlab','Lumen from VolumeSegmenter'});
             switch indx                   
                 case 1
                     %%Posible idea: try catch this line and if an error occurs get
@@ -84,6 +84,9 @@ function plantSeg_PostProcessing(outputDir, fileName)
                     labelledImage(labelledImage == lumenIndex) = 0;
                 case 2
                     lumenImage = zeros(size(labelledImage));
+                case 3
+                    load(fullfile(outputDir, 'lumen.mat'),'labels')
+                    lumenImage = double(labels)==1;
             end
             
         end
