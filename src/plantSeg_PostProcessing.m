@@ -87,6 +87,7 @@ function plantSeg_PostProcessing(outputDir, fileName)
                 case 3
                     load(fullfile(outputDir, 'lumen.mat'),'labels')
                     lumenImage = double(labels)==1;
+                    labelledImage(lumenImage == 1) = 0;
             end
             
         end
