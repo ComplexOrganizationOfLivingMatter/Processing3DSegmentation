@@ -60,13 +60,16 @@ function plantSeg_PostProcessing(outputDir, fileName)
             tiff_stack = cat(3 , tiff_stack, temp_tiff);
         end
         
-        %set the background to the '0' label
-        if min(tiff_stack(:))==1
-            labelledImage = double(tiff_stack)-1;
+        if endsWith(fileName,'multicut.tiff')
+          labelledImage = relabelMulticutTiff(double(tiff_stack));  
         else
-            labelledImage = double(tiff_stack);
+            %set the background to the '0' label
+            if min(tiff_stack(:))==1
+                labelledImage = double(tiff_stack)-1;
+            else
+                labelledImage = double(tiff_stack);
+            end
         end
-        
         
         if size(dir(fullfile(outputDir, 'Lumen/SegmentedLumen', '*.tif')),1) > 0
             [labelledImage, lumenImage] = processLumen(fullfile(outputDir, 'Lumen', filesep), labelledImage, resizeImg, tipValue);
