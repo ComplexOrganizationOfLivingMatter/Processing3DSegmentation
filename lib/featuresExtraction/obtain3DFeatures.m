@@ -26,6 +26,11 @@ function [cells3dFeatures, tissue3dFeatures, lumen3dFeatures,hollowTissue3dFeatu
             lateral3dInfo = lateral3dInfo_total;
             clearvars lateral3dInfo_total lateralLayerAux
         end
+        
+        %delete non real neighbours assuming lateral contact threshold
+        apical3dInfo = cellfun(@(x,y) x(ismember(x,y)), apical3dInfo,lateral3dInfo,'UniformOutput',false);
+        basal3dInfo = cellfun(@(x,y) x(ismember(x,y)), basal3dInfo,lateral3dInfo,'UniformOutput',false);
+        
 
         %check for non considered valid cells, and delete cells "0" volume
         missingCells = find(totalLateralCellsArea==0);
