@@ -13,7 +13,7 @@ function [CellularFeaturesValidCells,CellularFeaturesAllCells, meanSurfaceRatio,
 
     %%  Calculate number of neighbours of each cell
     number_neighbours = table(cellfun(@length,(apical3dInfo)),cellfun(@length,(basal3dInfo)),cellfun(@length,(lateral3dInfo)));
-    
+   
     apicobasal_neighbours=cellfun(@(x,y)(unique(vertcat(x,y))), apical3dInfo, basal3dInfo, 'UniformOutput',false);
     apicobasal_neighboursRecount= cellfun(@length ,apicobasal_neighbours);
     
@@ -31,9 +31,9 @@ function [CellularFeaturesValidCells,CellularFeaturesAllCells, meanSurfaceRatio,
     volume_cells=table2array(regionprops3(labelledImage,'Volume'));
 
     %%  Determine if a cell is a scutoid or not
-    scutoids_cells=cellfun(@(x,y) double(~isequal(x,y)), neighbours_data.Apical,neighbours_data.Basal);
-    apicoBasalTransitions = cellfun(@(x, y) length(unique(vertcat(setdiff(x, y), setdiff(y, x)))), neighbours_data.Apical,neighbours_data.Basal);
-    
+    apicoBasalTransitions = cellfun(@(x, y) length(unique(vertcat(setdiff(y,x), setdiff(x,y)))), neighbours_data.Apical,neighbours_data.Basal);
+    scutoids_cells = double(apicoBasalTransitions>0);
+
     %% Calculate cell height
     cell_heights = calculateCellHeight(apicalLayer, basalLayer);
     

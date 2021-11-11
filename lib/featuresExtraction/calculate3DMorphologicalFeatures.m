@@ -21,8 +21,8 @@ function [allGeneralInfo,allTissues,allLumens,allHollowTissue3dFeatures,allNetwo
         
         %% Calculate mean and std of 3D features
         cells3dFeatures((cells3dFeatures.ID_Cell == "Lumen" | cells3dFeatures.ID_Cell == "Tissue and Lumen"),:)=[];
-        meanCellsFeatures = varfun(@(x) mean(x),cells3dFeatures(:, 2:end-2));
-        stdCellsFeatures = varfun(@(x) std(x),cells3dFeatures(:, 2:end-2));
+        meanCellsFeatures = varfun(@(x) mean(x),cells3dFeatures(:, [(2:end-3),end]));
+        stdCellsFeatures = varfun(@(x) std(x),cells3dFeatures(:, [(2:end-3),end]));
 
         % Voxels/Pixels to Micrometers
         [totalMeanCellsFeatures,totalStdCellsFeatures, tissue3dFeatures, allLumens,allHollowTissue3dFeatures] = convertPixelsToMicrons(meanCellsFeatures,stdCellsFeatures, tissue3dFeatures, lumen3dFeatures,hollowTissue3dFeatures,pixelScale);
@@ -32,7 +32,6 @@ function [allGeneralInfo,allTissues,allLumens,allHollowTissue3dFeatures,allNetwo
 
         save(fullfile(path2save, 'global_3dFeatures.mat'), 'allGeneralInfo', 'totalMeanCellsFeatures','totalStdCellsFeatures', 'allLumens', 'allTissues', 'allNetworkFeatures', 'allHollowTissue3dFeatures');
     else
-        
         load(fullfile(path2save, 'global_3dFeatures.mat'), 'allGeneralInfo', 'totalMeanCellsFeatures','totalStdCellsFeatures', 'allLumens', 'allTissues', 'allNetworkFeatures', 'allHollowTissue3dFeatures');
     end
     
