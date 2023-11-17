@@ -2,7 +2,7 @@ function [neighsFiltered,totalLateralCellsArea,absoluteLateralContacts] = getLat
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
-    se = strel('cuboid', [dilatedPixels dilatedPixels dilatedPixels]);
+    se = strel('sphere',dilatedPixels);
     cells=1:max(max(max(lateralLayer)));
     
     totalLateralCellsArea = zeros(length(cells),1);
@@ -49,4 +49,3 @@ function [neighsFiltered,totalLateralCellsArea,absoluteLateralContacts] = getLat
     
     neighsFiltered = cellfun(@(x,y) setxor(x,y),neighs_real,neighs2delete,'UniformOutput',false)';
 end
-
