@@ -2,6 +2,9 @@ function [cells3dFeatures] = extract3dDescriptors(labelledImage, validCells)
 %EXTRACT3DDESCRIPTORS Summary of this function goes here
 %   Detailed explanation goes here
 cells3dFeatures=[];
+if ismember(0,validCells)
+    validCells(validCells==0)=[];
+end
 
 for indexCell = 1:length(validCells)
     actualImg = bwlabeln(labelledImage==validCells(indexCell));
@@ -13,15 +16,19 @@ for indexCell = 1:length(validCells)
             oneCell3dFeatures = oneCell3dFeatures(indMax,:);
         end
         
-%         [x, y, z] = ind2sub(size(labelledImage), find(actualImg==indMax));
-%         [~, convexVolume] = convhull(x, y, z);
-%         oneCell3dFeatures.ConvexVolume = convexVolume;
-%         oneCell3dFeatures.Solidity = sum(actualImg(:)==indMax) / convexVolume;
+        %         [x, y, z] = ind2sub(size(labelledImage), find(actualImg==indMax));
+        %         [~, convexVolume] = convhull(x, y, z);
+        %         oneCell3dFeatures.ConvexVolume = convexVolume;
+        %         oneCell3dFeatures.Solidity = sum(actualImg(:)==indMax) / convexVolume;
         aspectRatio = max(oneCell3dFeatures.PrincipalAxisLength,[],2) ./ min(oneCell3dFeatures.PrincipalAxisLength,[],2);
         sphereArea = 4 * pi .* ((oneCell3dFeatures.EquivDiameter) ./ 2) .^ 2;
         sphericity = sphereArea ./ oneCell3dFeatures.SurfaceArea;
         normalizedVolume = oneCell3dFeatures.Volume;
         irregularityShapeIndex = sqrt(oneCell3dFeatures.SurfaceArea)./(oneCell3dFeatures.Volume.^(1/3));
+        cells3dFeatures = [cells3dFeatures; horzcat(oneCell3dFeatures, table(aspectRatio, sphericity, normalizedVolume,irregularityShapeIndex))];
+    else
+        aspectRatio = 0; sphericity=0; normalizedVolume = 0; irregularityShapeIndex = 0;
+        oneCell3dFeatures = horzcat(table([0 0 0],'VariableNames',{'PrincipalAxisLength'}),table(0,0,0,0,0,'VariableNames',{'Volume' 'ConvexVolume' 'Solidity', 'SurfaceArea' 'EquivDiameter'}));
         cells3dFeatures = [cells3dFeatures; horzcat(oneCell3dFeatures, table(aspectRatio, sphericity, normalizedVolume,irregularityShapeIndex))];
     end
 end
