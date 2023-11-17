@@ -1,6 +1,16 @@
-function [CellularFeaturesValidCells,CellularFeaturesAllCells, meanSurfaceRatio, apicobasal_neighbours,polygon_distribution] = calculate_CellularFeatures(apical3dInfo,basal3dInfo,lateral3dInfo,apicalLayer,basalLayer,labelledImage,totalLateralCellsArea,absoluteLateralContacts,noValidCells,validCells)
+function [CellularFeaturesValidCells,CellularFeaturesAllCells, meanSurfaceRatio, apicobasal_neighbours,polygon_distribution] = calculate_CellularFeatures(apical3dInfo,basal3dInfo,lateral3dInfo,apicalLayer,basalLayer,labelledImage,totalLateralCellsArea,absoluteLateralContacts,validCells)
     %CALCULATE_CELLULARFEATURES Summary of this function goes here
     %   Detailed explanation goes here
+
+    %%  Determine if a cell is a scutoid or not
+    apicoBasalTransitions = cellfun(@(x, y) length(unique(vertcat(setdiff(y,x), setdiff(x,y)))), apical3dInfo,basal3dInfo);
+    scutoids_cells = double(apicoBasalTransitions>0);
+    
+    %% Filter Scutoids
+    [scutoids_cells,apical3dInfo,basal3dInfo,lateral3dInfo]  = filterScutoids(apical3dInfo, basal3dInfo, lateral3dInfo, scutoids_cells);
+    
+    %% Correct apicoBasalTransitions
+    apicoBasalTransitions = cellfun(@(x, y) length(unique(vertcat(setdiff(y,x), setdiff(x,y)))), apical3dInfo,basal3dInfo);
 
     %% Calculate polygon distribution
     [polygon_distribution_Apical] = calculate_polygon_distribution(cellfun(@length, apical3dInfo), validCells);
@@ -13,7 +23,7 @@ function [CellularFeaturesValidCells,CellularFeaturesAllCells, meanSurfaceRatio,
 
     %%  Calculate number of neighbours of each cell
     number_neighbours = table(cellfun(@length,(apical3dInfo)),cellfun(@length,(basal3dInfo)),cellfun(@length,(lateral3dInfo)));
-   
+    
     apicobasal_neighbours=cellfun(@(x,y)(unique(vertcat(x,y))), apical3dInfo, basal3dInfo, 'UniformOutput',false);
     apicobasal_neighboursRecount= cellfun(@length ,apicobasal_neighbours);
     
@@ -29,15 +39,10 @@ function [CellularFeaturesValidCells,CellularFeaturesAllCells, meanSurfaceRatio,
 
     %%  Calculate volume cells
     volume_cells=table2array(regionprops3(labelledImage,'Volume'));
-
-    %%  Determine if a cell is a scutoid or not
-    apicoBasalTransitions = cellfun(@(x, y) length(unique(vertcat(setdiff(y,x), setdiff(x,y)))), neighbours_data.Apical,neighbours_data.Basal);
-    scutoids_cells = double(apicoBasalTransitions>0);
-
+    
     %% Calculate cell height
     cell_heights = calculateCellHeight(apicalLayer, basalLayer);
     
-
     %%  Export to a excel file
     ID_cells=(1:length(basal3dInfo)).';
     CellularFeaturesAllCells=table(ID_cells,number_neighbours.Var1',number_neighbours.Var2',number_neighbours.Var3',apicobasal_neighboursRecount',scutoids_cells', apicoBasalTransitions', apical_area_cells,basal_area_cells,lateral_area_cells, average_lateral_wall, std_lateral_wall, volume_cells,cell_heights);
